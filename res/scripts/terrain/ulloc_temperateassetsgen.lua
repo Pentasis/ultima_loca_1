@@ -37,7 +37,7 @@ data.Make = function(layers, config, mkTemp, heightMap, ridgesMap, distanceMap)
 	local permeability = 0.51 + math.sqrt(config.humidity) * 0.12 - 0.19 -- overall size of forest
 	local permeabilityVariance = 1.3 -- variability in size of forest
 	-- Densities and composition
-	local plainTreeVals = {0.2}
+	local plainTreeVals = {0.1} -- .2
 	local plainTreeTypes = { plains, 0}
 
 	-- LEVEL 2: River trees
@@ -51,19 +51,19 @@ data.Make = function(layers, config, mkTemp, heightMap, ridgesMap, distanceMap)
 
 	-- LEVEL 3: Hill trees
 	-- Densities and composition
-	local hillTreeVals = { 0.82 }
+	local hillTreeVals = { 0.95 } -- 0.82
 	local hillTreeTypes = { 0, hills}
 	-- Heights
-	local hillsHighLimit = 130 -- absolute [m]
+	local hillsHighLimit = config.treeLimit / 3 --130 -- absolute [m]
 
 	-- LEVEL 4: Ridge trees (conifers)
 	-- Densities
-	local maxSlope = 0.8 -- also for hills
+	local maxSlope = 0.6 -- also for hills -- .8
 	local coniferDitheringCutoff = 0.6
 	-- Heights
-	local coniferLimit = 120 -- absolute [m] (where conifers have full density)
-	local coniferTransitionLow = 30 -- transition size [m] (offset for conifers start)
-	local coniferTransitionHigh = 80 -- transition size [m] (offset for conifer end)
+	local coniferLimit = hillsHighLimit * 0.75 --120 -- absolute [m] (where conifers have full density)
+	local coniferTransitionLow = coniferLimit / 4 --30 -- transition size [m] (offset for conifers start)
+	local coniferTransitionHigh = coniferTransitionLow * 3 --80 -- transition size [m] (offset for conifer end)
 	
 	
 	-- #################
@@ -233,8 +233,10 @@ data.Make = function(layers, config, mkTemp, heightMap, ridgesMap, distanceMap)
 
 	-- #################
 	-- ####  ROCKS
-	layers:WhiteNoise(rocksMap, 0.005)
-	
+	if config.do_rocks == 1 then
+		layers:WhiteNoise(rocksMap, 0.005)
+	end
+
 	-- Stones on beach
 	local layerBeach_maxDistance = 20
 	local layerBeach_gain = 1.2

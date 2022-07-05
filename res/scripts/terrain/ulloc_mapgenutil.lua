@@ -68,8 +68,11 @@ function data.MakeRivers(valleys, config, startLength, startPosition, startDirec
 	for i = 1, 60 do
 		valley.points[#valley.points + 1] = position
 		valley.widths[#valley.widths + 1] = vec2.new( -- add small Brownian motion to river bank
-			12 * (5 - order / 1.5) + math.random() * 22, 
-			12 * (5 - order / 1.5) + math.random() * 22
+			-- Pentasis: this was changed
+			--12 * (5 - order / 1.5) + math.random() * 22,
+			--12 * (5 - order / 1.5) + math.random() * 22
+			12 * config.width + math.random() * 22,
+			12 * config.width + math.random() * 22
 		)
 		valley.depths[#valley.depths + 1] = config.depthScale * (3 + math.random() * 1) * 1.5
 		
@@ -168,6 +171,9 @@ function data.MakeRivers(valleys, config, startLength, startPosition, startDirec
 		for i = 2, #valley.points - 1 do
 			if math.random() < riverProbability[order + 1] * config.baseProbability
 				and count <= childCount[order + 1] and i - lastFeeder > config.minDist then
+				  if config.doRandomWidth then
+						config.width = math.randf(0.1, config.width)
+					end
 					local side = math.random() < 0.5 and 1 or -1
 					local newDirection = directions[i] + side * math.pi * math.randf(0.1, 0.3)
 					local newLength = math.randf(2 / 3, 1) * length
@@ -181,7 +187,7 @@ function data.MakeRivers(valleys, config, startLength, startPosition, startDirec
 					end
 					totVolume = totVolume + riverVolume
 
-					valley.widths[i][side == 1 and "x" or "y"] = valley.widths[i][side == 1 and "x" or "y"] + 10
+					valley.widths[i][side == 1 and "x" or "y"] = valley.widths[i][side == 1 and "x" or "y"] + 100
 
 					count = count + 1
 					lastFeeder = i
