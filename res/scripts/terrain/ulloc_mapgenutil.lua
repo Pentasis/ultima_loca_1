@@ -74,7 +74,8 @@ function data.MakeRivers(valleys, config, startLength, startPosition, startDirec
 			12 * config.width + math.random() * 22,
 			12 * config.width + math.random() * 22
 		)
-		valley.depths[#valley.depths + 1] = config.depthScale * (3 + math.random() * 1) * 1.5
+		local depth = config.depthScale + (config.width / 30)
+		valley.depths[#valley.depths + 1] = depth * (3 + math.random() * 1) * 1.5
 		
 		valley.widthTangents[#valley.widthTangents + 1] = vec2.new(0,0)
 		valley.depthTangents[#valley.depthTangents + 1] = 0
@@ -172,7 +173,7 @@ function data.MakeRivers(valleys, config, startLength, startPosition, startDirec
 			if math.random() < riverProbability[order + 1] * config.baseProbability
 				and count <= childCount[order + 1] and i - lastFeeder > config.minDist then
 				  if config.doRandomWidth then
-						config.width = math.randf(0.1, config.width)
+						config.width = math.random(1, config.width)
 					end
 					local side = math.random() < 0.5 and 1 or -1
 					local newDirection = directions[i] + side * math.pi * math.randf(0.1, 0.3)

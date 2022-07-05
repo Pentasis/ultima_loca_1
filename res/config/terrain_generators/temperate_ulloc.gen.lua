@@ -2,14 +2,13 @@ local mapgenutil = require "terrain/ulloc_mapgenutil"
 local temperateassetsgen = require "terrain/ulloc_temperateassetsgen"
 local layersutil = require "terrain/layersutil"
 local maputil = require "maputil"
-local climate = require "ultima_loca/climate_snow"
 
 local RIVER_WIDTH = { 8, 6, 4, 2, 0, 0.8, 0.7, 0.6, 0.4, 0.2, 0.1 }
 
 function data()
 
   return {
-    climate = "temperate.clima.lua",
+    climate = "ulloc_temperate.clima.lua",
     order = 0,
     name = _("Ultima Loca Temperate"),
     params = {
@@ -42,6 +41,13 @@ function data()
         uiType = "SLIDER",
       },
       {
+        key = "ulloc_curves",
+        name = _("River curvature"),
+        values = { "", "", "", "", "", "", "", "", "", "", "" },
+        defaultIndex = 2,
+        uiType = "SLIDER",
+      },
+      {
         key = "ulloc_rand_river",
         name = _("Random river widths?"),
         values = { "No", "Yes" },
@@ -54,14 +60,6 @@ function data()
         values = { "No", "Yes" },
         defaultIndex = 1,
         uiType = "BUTTON",
-      },
-      {
-        key = "ulloc_lakes",
-        name = _("Scattered Lakes"),
-        values = { "", "", "", "", "", "", "", "", "", "", "" },
-        defaultIndex = 5,
-        uiType = "SLIDER",
-        tooltip = "Lakes that are not connected to a river.",
       },
       {
         key = "ulloc_tree_density",
@@ -136,6 +134,7 @@ function data()
         minDist = water > 0.5 and 2 or 3,
         width = params.ulloc_river_width,
         doRandomWidth = params.ulloc_rand_river == 1,
+        curvature = params.ulloc_curves / 10,
       }
 
       local rivers = {}
