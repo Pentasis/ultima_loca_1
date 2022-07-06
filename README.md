@@ -31,3 +31,6 @@ The reason I made this was because I found the vanilla generator and other modde
 - Scattered lakes (outside rivers)?
 - Translations
 - Finetuning (mountain height-density ratio, river depth & width randomness)
+
+### Important
+If you enable the snow caps option, they will also appear in the (temperate) vanilla generator and any other modded generator that uses the temperate climate.
