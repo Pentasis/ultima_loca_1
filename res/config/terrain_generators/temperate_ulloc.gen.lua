@@ -3,12 +3,12 @@ local temperateassetsgen = require "terrain/ulloc_temperateassetsgen"
 local layersutil = require "terrain/layersutil"
 local maputil = require "maputil"
 
-local RIVER_WIDTH = { 8, 6, 4, 2, 0, 0.8, 0.7, 0.6, 0.4, 0.2, 0.1 }
+-- local RIVER_WIDTH = { 8, 6, 4, 2, 0, 0.8, 0.7, 0.6, 0.4, 0.2, 0.1 }
 
 function data()
 
   return {
-    climate = "ulloc_temperate.clima.lua",
+    climate = "temperate.clima.lua",
     order = 0,
     name = _("Ultima Loca Temperate"),
     params = {
@@ -37,7 +37,7 @@ function data()
         key = "ulloc_river_width",
         name = _("River width"),
         values = { "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "" },
-        defaultIndex = 5,
+        defaultIndex = 8,
         uiType = "SLIDER",
       },
       {
@@ -76,17 +76,10 @@ function data()
         defaultIndex = 5,
         uiType = "SLIDER",
       },
-      --{
-      --  key = "ulloc_snowtops",
-      --  name = _("Snowtops"),
-      --  values = { "None", "High", "Medium", "Low" },
-      --  defaultIndex = 1,
-      --  uiType = "BUTTON",
-      --},
       {
         key = "ulloc_rocks",
         name = _("Scattered Rocks?"),
-        values = { "No", "Yes" },
+        values = { "None", "Along rivers", "Everywhere" },
         defaultIndex = 1,
         uiType = "BUTTON",
         tooltip = "Rocks will still be placed on riverbanks.",
@@ -102,10 +95,6 @@ function data()
     updateFn = function(params)
       math.randomseed(math.random(1, 100000000))
 
-      --if params.ulloc_snowtops > 0 then
-      --  addModifier("loadClimate", climate.snowTops)
-      --end
-
       local result = {
         parallelFactor = 32,
         heightmapLayer = "HM",
@@ -115,10 +104,8 @@ function data()
       -- #################
       -- #### CONFIG
       local heightness = params.ulloc_mountain_height
-      local hillyness = params.ulloc_terrain_ratio / 10
-      if heightness > 5 then
-        hillyness = hillyness / 2
-      end
+      -- hilliness must depend on height otherwise the map becomes 100% mountain @ higher settings.
+      local hillyness = params.ulloc_terrain_ratio / (heightness + 8)
       local water = params.ulloc_rivers / 10
       local humidity = params.ulloc_tree_density / 10
       local treeline = params.ulloc_treeline / 10
@@ -127,7 +114,7 @@ function data()
 
       local riverConfig = {
         depthScale = 1.5,
-        maxOrder = math.round(water * 16), --2,
+        maxOrder = math.floor(water * 14), --2,
         segmentLength = 2400,
         bounds = params.bounds,
         baseProbability = water * water * 2,
