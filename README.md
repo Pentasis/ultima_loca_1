@@ -1,14 +1,15 @@
 # Ultima Loca
 
-This generator will create well-defined mountain ranges with very flat areas inbetween.
+This generator enables (mixed !) narrow & wide rivers and well-defined mountain ranges with very flat areas inbetween.
 
 It is still WIP but functional and safe to use.
 
-The reason I made this was because I found the vanilla generator and other modded generators didn't create very scenic maps because the transitions between highland and lowland was too gradual & 'bumpy' for my taste. Also, I wanted to have more control over rivers; especially their widths.
+The reason I made this was because I found the vanilla generator and other modded generators didn't create very scenic and practical maps because the transitions between highland and lowland was too gradual & 'bumpy' for my taste. Also, I wanted to have more control over rivers; especially their widths.
 
 ## Mountains
-- Higher mountains (upto about 1100m) with a more distinct transition between flatland and mountain ranges.
+- Higher mountains (upto about 1500m) with a more distinct transition between flatland and cliffs.
 - If you enable snow tops in the mod settings (on by default) mountain tops will be covered in snow above ~750m.
+- NOTE: Mountain density is a fickle setting which seems to depend (internally) on the map seed. Esp. if you set the maximum mountain height to maximum. (I'm still finetuning this).
 
 ## Rivers
 - Rivers can be much narrower and wider than in vanilla. (Keep in mind that ships cannot navigate very narrow rivers.)
@@ -27,8 +28,8 @@ The reason I made this was because I found the vanilla generator and other modde
 - The treeline (height) on mountains can be changed.
 
 ### TODO:
-- Option to add a coastline?
-- Scattered lakes (outside rivers)?
+- Option to add a coastline? (help needed)
+- Scattered lakes (outside rivers)? (help needed)
 - Translations
 - Finetuning (mountain height-density ratio, river depth & width randomness)
 

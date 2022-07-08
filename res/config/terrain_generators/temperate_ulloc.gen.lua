@@ -3,8 +3,6 @@ local temperateassetsgen = require "terrain/ulloc_temperateassetsgen"
 local layersutil = require "terrain/layersutil"
 local maputil = require "maputil"
 
--- local RIVER_WIDTH = { 8, 6, 4, 2, 0, 0.8, 0.7, 0.6, 0.4, 0.2, 0.1 }
-
 function data()
 
   return {
@@ -13,18 +11,27 @@ function data()
     name = _("Ultima Loca Temperate"),
     params = {
       {
-        key = "ulloc_terrain_ratio",
-        name = _("Mountain Density"),
-        values = { "", "", "", "", "", "", "", "", "", "", "" },
+        key = "ulloc_mountain_low",
+        name = _("Minimum Height Mountains"),
+        values = { "", "", "", "", "", "", "", "", "", "" },
         defaultIndex = 5,
         uiType = "SLIDER",
+        tooltip = "From 20 to 200m in steps of 20m.",
       },
       {
         key = "ulloc_mountain_height",
-        name = _("Mountains Height"),
-        values = { "", "", "", "", "", "", "", "", "", "", "" },
+        name = _("Maximum Height Mountains"),
+        values = { "", "", "", "", "", "", "", "", "" },
         defaultIndex = 5,
         uiType = "SLIDER",
+        tooltip = "From 300 to 1500m in steps of 150m.",
+      },
+      {
+        key = "ulloc_terrain_ratio",
+        name = _("Mountain Density"),
+        values = { "Low", "Medium", "High" },
+        defaultIndex = 0,
+        uiType = "BUTTON",
       },
       {
         key = "ulloc_rivers",
@@ -71,7 +78,7 @@ function data()
       },
       {
         key = "ulloc_treeline",
-        name = _("Treeline"),
+        name = _("Treeline height"),
         values = { "", "", "", "", "", "", "", "", "", "", "" },
         defaultIndex = 5,
         uiType = "SLIDER",
@@ -103,22 +110,32 @@ function data()
 
       -- #################
       -- #### CONFIG
-      local heightness = params.ulloc_mountain_height
-      -- hilliness must depend on height otherwise the map becomes 100% mountain @ higher settings.
-      local hillyness = params.ulloc_terrain_ratio / (heightness + 8)
-      local water = params.ulloc_rivers / 10
+      local min_height_mountains = params.ulloc_mountain_low + 1
+      local max_height_mountains = params.ulloc_mountain_height + 2
+      local avg_height_mountains = (max_height_mountains + min_height_mountains) / 2
+
+      -- There are 9 levels, determined practically MAX density goes from 0.1 to 0.9; so we can divide by 10
+      -- The minimum height does not have much effect on density (just slightly, we can ignore it)
+      local mountain_density = (11 - max_height_mountains) / 10
+      -- LOW, MED & MAX is 3 levels, so we divide by 3
+      mountain_density = mountain_density / 3
+      -- then we multiple by level
+      mountain_density = (params.ulloc_terrain_ratio + 1) * mountain_density
+
+
+      local river_amount = params.ulloc_rivers / 10
       local humidity = params.ulloc_tree_density / 10
       local treeline = params.ulloc_treeline / 10
 
-      local noWater = water == 0
+      local noWater = river_amount == 0
 
       local riverConfig = {
         depthScale = 1.5,
-        maxOrder = math.floor(water * 14), --2,
+        maxOrder = math.floor(river_amount * 14),
         segmentLength = 2400,
         bounds = params.bounds,
-        baseProbability = water * water * 2,
-        minDist = water > 0.5 and 2 or 3,
+        baseProbability = river_amount * river_amount * 2,
+        minDist = river_amount > 0.5 and 2 or 3,
         width = params.ulloc_river_width,
         doRandomWidth = params.ulloc_rand_river == 1,
         curvature = params.ulloc_curves / 10,
@@ -130,42 +147,25 @@ function data()
         mapgenutil.MakeRivers(rivers, riverConfig, 120000, start.pos, start.angle)
 
         if params.ulloc_river_lakes == 1 then
-          local lakeProb1 = water > 0.2 and 0.2 or 0 -- math.map(water, 0, 1, 0.0, 0.1)
-          local lakeProb2 = water > 0.2 and 0.4 or 0.9 -- math.map(water, 0, 1, 0.1, 0.1)
           local lakeConfig = {
             getLakePropability = function()
-              return water + 0.2
+              return river_amount + 0.2
             end,
-            lakeSize = water * 600,
+            lakeSize = river_amount * 600,
           }
           mapgenutil.MakeLakesOld(rivers, lakeConfig)
         end
 
-        -- local curvesConfig = {
-        -- getStrength = function(position)
-        -- return 0.7
-        -- end,
-        -- getWidthMultiplier = function(position)
-        -- return 1
-        -- end
-        -- }
-        -- mapgenutil.MakeCurvesOld(rivers, curvesConfig)
-
         maputil.Convert(rivers)
         maputil.ValidateRiver(rivers)
-        -- maputil.PrintRiver(rivers)
       end
-
-      -- if params.ulloc_lakes > 0 then
-
-      -- end
 
       local ridgesConfig = {
         bounds = params.bounds,
-        probabilityLow = 0.1 + 0.5 * hillyness,
-        probabilityHigh = 0.3 + 0.3 * hillyness,
-        minHeight = 0 + 10 * heightness,
-        maxHeight = 75 + 100 * heightness,
+        probabilityLow = mountain_density,
+        probabilityHigh = 0,
+        minHeight = (10 * min_height_mountains) + (10 * min_height_mountains),
+        maxHeight = (50 * max_height_mountains) + (100 * max_height_mountains),
       }
 
       local valleys = {}
@@ -187,7 +187,7 @@ function data()
       end
 
       local noiseMap = mkTemp:Get()
-      result.layers:Noise(noiseMap, 150 * hillyness)
+      result.layers:Noise(noiseMap, 15 * avg_height_mountains)
 
       local distanceMap = mkTemp:Get()
       result.layers:Distance(result.heightmapLayer, distanceMap)
@@ -248,7 +248,7 @@ function data()
         config = {
           -- GENERIC
           humidity = -1,
-          water = water,
+          water = river_amount,
           -- LEVEL 3
           hillsLowLimit = 0, -- relative [m]
           hillsLowTransition = 0, -- relative [m]
@@ -262,7 +262,7 @@ function data()
         config = {
           -- GENERIC
           humidity = humidity / 2.5,
-          water = water,
+          water = river_amount,
           -- LEVEL 3
           hillsLowLimit = 20, -- relative [m]
           hillsLowTransition = 20, -- relative [m]

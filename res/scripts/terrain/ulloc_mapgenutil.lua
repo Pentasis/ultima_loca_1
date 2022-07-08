@@ -439,8 +439,7 @@ function data.MakeRidges(config)
 
 	for i = -ny, ny do
 		for j = -nx, nx do
-			
-		
+
 			local randomNumber = math.random()
 			local numr = config.density ~= nil and config.density or 
 				(randomNumber > config.probabilityLow and 0 or (randomNumber > config.probabilityHigh and 1 or 2))
