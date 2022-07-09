@@ -64,30 +64,30 @@ function data.MakeRivers(valleys, config, startLength, startPosition, startDirec
 		feeders = {}, -- cached
 	}
 	local directions = {}
- 
+
 	for i = 1, 60 do
 		valley.points[#valley.points + 1] = position
 		valley.widths[#valley.widths + 1] = vec2.new( -- add small Brownian motion to river bank
-			-- Pentasis: this was changed
-			--12 * (5 - order / 1.5) + math.random() * 22,
-			--12 * (5 - order / 1.5) + math.random() * 22
-			12 * config.width + math.random() * 22,
-			12 * config.width + math.random() * 22
+		-- Pentasis: this was changed
+		--12 * (5 - order / 1.5) + math.random() * 22,
+		--12 * (5 - order / 1.5) + math.random() * 22
+		12 * config.width + math.random() * 22,
+		12 * config.width + math.random() * 22
 		)
 		local depth = config.depthScale + (config.width / 30)
 		valley.depths[#valley.depths + 1] = depth * (3 + math.random() * 1) * 1.5
-		
+
 		valley.widthTangents[#valley.widthTangents + 1] = vec2.new(0,0)
 		valley.depthTangents[#valley.depthTangents + 1] = 0
 		valley.features[#valley.features + 1] = {}
 		directions[#directions + 1] = 0.5 * (direction + oldDirection)
-		
+
 		local step = config.segmentLength ~= nil and config.segmentLength or 0.667 * (50.0 + 5 * math.sqrt(length))
 		local dirVec = vec2.fromAngle(direction)
 		position = vec2.add(position, vec2.mul(step, dirVec))
 		length = length - step
 		valley.tangents[#valley.tangents + 1] = vec2.mul(vec2.length(vec2.sub(position, oldPosition)), vec2.fromAngle(0.5 * (direction + oldDirection) + math.randf(-math.rad(-20), math.rad(20))))
-		
+
 		-- BEGIN DETECT INTERSECTIONS
 		if oldPosition ~= nil then
 			local nsegments = math.ceil(vec2.distance(position, oldPosition) / distanceCheck) * 4
@@ -106,12 +106,12 @@ function data.MakeRivers(valleys, config, startLength, startPosition, startDirec
 
 		if length < 0 then return 0 end
 		if position.x > config.bounds.max.x + 5000
-			or position.y > config.bounds.max.y + 5000
-			or position.x < config.bounds.min.x - 5000
-			or position.y < config.bounds.min.y - 5000 then
+		or position.y > config.bounds.max.y + 5000
+		or position.x < config.bounds.min.x - 5000
+		or position.y < config.bounds.min.y - 5000 then
 			break
-		end	
-		
+		end
+
 		-- BEGIN DETECT INTERSECTIONS
 		local dmap = { }
 		if oldPosition ~= nil then
@@ -131,13 +131,13 @@ function data.MakeRivers(valleys, config, startLength, startPosition, startDirec
 				for k, index in pairs(dmap) do
 					if config.map[index] ~= nil then
 						for k2, mapVal in pairs(config.map[index]) do
-							if mapVal.riverId ~= config.map.riverId 
-								and not (i == 1 and mapVal.riverId == feededId)
-								and not (newPos.x < config.bounds.min.x)
-								and not (newPos.x > config.bounds.max.x)
-								and not (newPos.y < config.bounds.min.y)
-								and not (newPos.y > config.bounds.max.y)
-								and vec2.distance(mapVal.position, newPos) < distanceCheck then
+							if mapVal.riverId ~= config.map.riverId
+							and not (i == 1 and mapVal.riverId == feededId)
+							and not (newPos.x < config.bounds.min.x)
+							and not (newPos.x > config.bounds.max.x)
+							and not (newPos.y < config.bounds.min.y)
+							and not (newPos.y > config.bounds.max.y)
+							and vec2.distance(mapVal.position, newPos) < distanceCheck then
 								return 0
 							end
 						end
@@ -148,10 +148,22 @@ function data.MakeRivers(valleys, config, startLength, startPosition, startDirec
 		-- BEGIN DETECT INTERSECTIONS
 		oldPosition = position
 		oldDirection = direction
-		
+
 		local newDirection = math.clamp(step / 300, 0.667, 1.5) * math.randf(-config.curvature, config.curvature)
 		if math.abs(totalDirection + newDirection) > math.rad(135) then newDirection = 0 end
-		
+		--local newDirection = 0
+		--if math.abs(totalDirection + newDirection) <= math.rad(135) then
+		--	newDirection = math.clamp(step / 300, 0.667, 1.5) * math.randf(-config.curvature, config.curvature)
+		--end
+		if config.is_winding then
+			if totalDirection > math.rad(25) then
+				newDirection = math.rad(-math.random(35,115))
+			elseif
+			totalDirection < math.rad(-25) then
+				newDirection = math.rad(math.random(35,115))
+			end
+		end
+
 		totalDirection = totalDirection + newDirection
 		direction = direction + newDirection
 	end

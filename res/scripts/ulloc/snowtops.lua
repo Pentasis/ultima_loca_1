@@ -4,7 +4,7 @@ local snowtops = {}
 
 function snowtops.addSnowToTemperate(filename, climate)
   if climate ~= nil then
-    if climate.updateFn ~= nil then
+    if climate.updateFn ~= nil and climate.id == "temperate" then
       climate.updateFn = function (params)
         local result = {
           layers = layersutil.Layer.new(),

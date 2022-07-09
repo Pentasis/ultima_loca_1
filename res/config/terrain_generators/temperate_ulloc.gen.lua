@@ -30,7 +30,7 @@ function data()
         key = "ulloc_terrain_ratio",
         name = _("Mountain Density"),
         values = { "Low", "Medium", "High" },
-        defaultIndex = 0,
+        defaultIndex = 1,
         uiType = "BUTTON",
       },
       {
@@ -57,6 +57,13 @@ function data()
       {
         key = "ulloc_rand_river",
         name = _("Random river widths?"),
+        values = { "No", "Yes" },
+        defaultIndex = 0,
+        uiType = "BUTTON",
+      },
+      {
+        key = "ulloc_winding_river",
+        name = _("Winding (zig-zag) rivers?"),
         values = { "No", "Yes" },
         defaultIndex = 0,
         uiType = "BUTTON",
@@ -122,7 +129,6 @@ function data()
       -- then we multiple by level
       mountain_density = (params.ulloc_terrain_ratio + 1) * mountain_density
 
-
       local river_amount = params.ulloc_rivers / 10
       local humidity = params.ulloc_tree_density / 10
       local treeline = params.ulloc_treeline / 10
@@ -139,6 +145,7 @@ function data()
         width = params.ulloc_river_width,
         doRandomWidth = params.ulloc_rand_river == 1,
         curvature = params.ulloc_curves / 10,
+        is_winding = params.ulloc_winding_river == 1,
       }
 
       local rivers = {}
@@ -244,35 +251,19 @@ function data()
 
       local config = {}
 
-      if humidity == 0 then
-        config = {
-          -- GENERIC
-          humidity = -1,
-          water = river_amount,
-          -- LEVEL 3
-          hillsLowLimit = 0, -- relative [m]
-          hillsLowTransition = 0, -- relative [m]
-          -- LEVEL 4
-          treeLimit = 0, --160, -- absolute [m] (absolute maximal height)
-          ridgeFactor = 0 , -- lower means softer ridges detection, more trees (0.8)
-          valleyFactor = 0, -- lower means softer valleys detection, more trees (0.8)
-          do_rocks = params.ulloc_rocks,
-        }
-      else
-        config = {
-          -- GENERIC
-          humidity = humidity / 2.5,
-          water = river_amount,
-          -- LEVEL 3
-          hillsLowLimit = 20, -- relative [m]
-          hillsLowTransition = 20, -- relative [m]
-          -- LEVEL 4
-          treeLimit = treeline * ridgesConfig.maxHeight, --160, -- absolute [m] (absolute maximal height)
-          ridgeFactor = 1 - (humidity / 10), -- lower means softer ridges detection, more trees (0.8)
-          valleyFactor = 1 - (humidity / 10), -- lower means softer valleys detection, more trees (0.8)
-          do_rocks = params.ulloc_rocks,
-        }
-      end
+      config = {
+        -- GENERIC
+        humidity = humidity / 2.5,
+        water = river_amount,
+        -- LEVEL 3
+        hillsLowLimit = 20, -- relative [m]
+        hillsLowTransition = 20, -- relative [m]
+        -- LEVEL 4
+        treeLimit = treeline * ridgesConfig.maxHeight, --160, -- absolute [m] (absolute maximal height)
+        ridgeFactor = 1 - (humidity / 10), -- lower means softer ridges detection, more trees (0.8)
+        valleyFactor = 1 - (humidity / 10), -- lower means softer valleys detection, more trees (0.8)
+        do_rocks = params.ulloc_rocks,
+      }
 
       result.layers:PushColor("#007777")
       result.forestMap, result.treesMapping, result.assetsMap, result.assetsMapping = temperateassetsgen.Make(

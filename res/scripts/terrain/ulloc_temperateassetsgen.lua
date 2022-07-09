@@ -36,6 +36,7 @@ data.Make = function(layers, config, mkTemp, heightMap, ridgesMap, distanceMap)
   local seedDensity = 0.00008 - 0.0001 * config.humidity * config.humidity + 0.0001 -- increase to increase number of forest
   local permeability = 0.51 + math.sqrt(config.humidity) * 0.12 - 0.19 -- overall size of forest
   local permeabilityVariance = 1.3 -- variability in size of forest
+
   -- Densities and composition
   local plainTreeVals = { 0.1 } -- .2
   local plainTreeTypes = { plains, 0 }
@@ -65,6 +66,9 @@ data.Make = function(layers, config, mkTemp, heightMap, ridgesMap, distanceMap)
   local coniferTransitionLow = coniferLimit / 4 --30 -- transition size [m] (offset for conifers start)
   local coniferTransitionHigh = coniferTransitionLow * 3 --80 -- transition size [m] (offset for conifer end)
 
+  if config.humidity == 0 then
+    seedDensity = 0
+  end
 
   -- #################
   -- #### NO WATER GENERATION

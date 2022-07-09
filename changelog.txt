@@ -1,0 +1,4 @@
+1.2
+- only change temperate climate for snow caps. Before desert/tropical were also affected.
+- Added option for 'winding' rivers (zig-zag).
+- Change default for mountain density to 'medium'
