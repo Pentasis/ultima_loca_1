@@ -1,0 +1,62 @@
+[h1]Not so Temperate Generator[/h1]
+
+This generator creates mixed(!) narrower & wider rivers and well-defined mountain ranges with very flat areas inbetween.
+
+It is still WIP but functional and safe to use (lots more options and tweaks still to come).
+
+The reason I made this was because I found the vanilla generator and other modded generators didn't create very scenic and practical maps because the transitions between highland and lowland was too gradual & 'bumpy' for my taste. Also, I wanted to have more control over rivers; especially their widths.
+
+[h2]New Features & Changes[/h2]
+[list]
+[*]Winding rivers (v1.2)
+[*]Somewhat better mountain-density calculation*
+[*]Mountain ridge curvature (v1.3)
+[*]Removed minimum mountain height (now fixed at 150m)
+[*]Wider rivers than before (v1.3). I cannot make them wider than this because they will deform.
+[*]Bigger chance of (more) branching rivers.
+[*]Changed the name of the mod.
+[/list]
+
+*)Density is a tough setting to control. As mountains get higher, density goes up by default so I bring it down again. But there seems to be some sort of exponential factor involved I haven't figured out yet. Let me know in the comments if you are happy with how density works now.
+
+[h2]Mountains[/h2]
+[list]
+[*]Higher mountains (upto about 1500m) with a more distinct transition between flatland and cliffs.
+[*]If you enable snow tops in the mod settings (on by default) mountain tops will be covered in snow above ~750m.
+[*]Change mountain range curvature.
+[/list]
+
+[h2]Rivers[/h2]
+[list]
+[*]Rivers can be much narrower and wider than in vanilla. (Keep in mind that ships cannot navigate very narrow rivers.)
+[*]Wider rivers are also deeper.
+[*]Lake generation in rivers can be disabled.
+[*]More rivers.
+[*]Curved rivers.
+[*]Random river widths.
+[*]Winding (zig-zag) rivers. These seem to work best when river-curvature is set somewhere in the middle.
+[/list]
+
+[h2]Rocks[/h2]
+[list]
+[*]Option to disable scattered rocks on the map; completely or keep them along rivers.
+[/list]
+
+[h2]Trees & Forests[/h2]
+[list]
+[*]Amount of scattered forests can be set (forest density does not affect lone trees).
+[*]Forest density also affects the density of forests along mountain ridges.
+[*]When set to 0, no trees will generate at all.
+[*]The treeline (height) on mountains can be controlled.
+[/list]
+
+[h2]TODO:[/h2]
+[list]
+[*]Option to add a coastline?
+[*]Scattered lakes (outside rivers)?
+[*]Translations
+[*]Mod option for more rock textures?
+[/list]
+
+[h2]Important[/h2]
+If you enable the snow caps option, they will also appear in the (temperate) vanilla generator and any other modded generator that uses the temperate climate.

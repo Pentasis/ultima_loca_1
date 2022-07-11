@@ -18,13 +18,14 @@ The reason I made this was because I found the vanilla generator and other modde
 - More rivers.
 - Curved rivers.
 - Random river widths (still experimenting with this).
+- Option to make rivers 'zig-zag' more (since v1.2).
 
 ## Rocks
 - Option to disable scattered rocks on the map; completely or keep them along rivers.
 
 ## Trees & Forests
 - Amount of scattered forests can be set (tree density).
-- Tree density also affects the density of forests along mountain ridges, but in a limited way only. When set to 0 no trees will generate at all.
+- Tree density also affects the density of forests along mountain ridges.
 - The treeline (height) on mountains can be changed.
 
 ### TODO:
@@ -32,6 +33,7 @@ The reason I made this was because I found the vanilla generator and other modde
 - Scattered lakes (outside rivers)? (help needed)
 - Translations
 - Finetuning (mountain height-density ratio, river depth & width randomness)
+- Known Issue: Rocks do not render when trees are set to 0.
 
 ### Important
 If you enable the snow caps option, they will also appear in the (temperate) vanilla generator and any other modded generator that uses the temperate climate.

@@ -75,7 +75,7 @@ function data.MakeRivers(valleys, config, startLength, startPosition, startDirec
 		12 * config.width + math.random() * 22
 		)
 		local depth = config.depthScale + (config.width / 30)
-		valley.depths[#valley.depths + 1] = depth * (3 + math.random() * 1) * 1.5
+		valley.depths[#valley.depths + 1] = depth * (3 + math.random()) * 1.5
 
 		valley.widthTangents[#valley.widthTangents + 1] = vec2.new(0,0)
 		valley.depthTangents[#valley.depthTangents + 1] = 0
@@ -151,16 +151,12 @@ function data.MakeRivers(valleys, config, startLength, startPosition, startDirec
 
 		local newDirection = math.clamp(step / 300, 0.667, 1.5) * math.randf(-config.curvature, config.curvature)
 		if math.abs(totalDirection + newDirection) > math.rad(135) then newDirection = 0 end
-		--local newDirection = 0
-		--if math.abs(totalDirection + newDirection) <= math.rad(135) then
-		--	newDirection = math.clamp(step / 300, 0.667, 1.5) * math.randf(-config.curvature, config.curvature)
-		--end
 		if config.is_winding then
-			if totalDirection > math.rad(25) then
-				newDirection = math.rad(-math.random(35,115))
+			if totalDirection > math.rad(20) then
+				newDirection = math.rad(-math.random(20,120))
 			elseif
-			totalDirection < math.rad(-25) then
-				newDirection = math.rad(math.random(35,115))
+			totalDirection < math.rad(-20) then
+				newDirection = math.rad(math.random(20,120))
 			end
 		end
 
@@ -170,9 +166,9 @@ function data.MakeRivers(valleys, config, startLength, startPosition, startDirec
 
 	valleys[#valleys+1] = valley
 	
-	local riverProbability = {0.6, 0.4, 0.1, 0.05, 0.05}
-	local childCount = {12, 4, 4, 4, 4}
-	local baseVolume = {3, 2, 1, 1, 1}
+	local riverProbability = {0.7, 0.6, 0.5, 0.4, 0.3, 0.2, 0.1, 0.05, 0.05, 0.05} --{0.6, 0.4, 0.1, 0.05, 0.05}
+	local childCount = {12, 4, 4, 4, 4, 3, 3, 2, 2, 1}
+	local baseVolume = {3, 2, 2, 1, 1, 1, 1, 1, 1, 1}
 	
 	local totVolume = baseVolume[order + 1]
 	
@@ -184,9 +180,15 @@ function data.MakeRivers(valleys, config, startLength, startPosition, startDirec
 		for i = 2, #valley.points - 1 do
 			if math.random() < riverProbability[order + 1] * config.baseProbability
 				and count <= childCount[order + 1] and i - lastFeeder > config.minDist then
-				  if config.doRandomWidth then
-						config.width = math.random(1, config.width)
+				if config.doRandomWidth then
+					-- TODO: clean up this mess
+					local lower_limit_width = math.max(config.width * 0.25, 1)
+					local upper_limit_width = math.min(config.width * 0.75, 30)
+					if upper_limit_width <= lower_limit_width then
+						upper_limit_width = lower_limit_width + 1
 					end
+					config.width = math.random(lower_limit_width, upper_limit_width)
+				end
 					local side = math.random() < 0.5 and 1 or -1
 					local newDirection = directions[i] + side * math.pi * math.randf(0.1, 0.3)
 					local newLength = math.randf(2 / 3, 1) * length
@@ -402,7 +404,7 @@ function data.MakeLakesOld(rivers, lakeConfig)
 	end
 end
 
-function data.MakeRidge(startPos, startDir, startHeight, peakHeight, maxHeight, step)
+function data.MakeRidge(startPos, startDir, startHeight, peakHeight, maxHeight, step, angle)
 	local ridge = {
 		points = {},
 		heights = {},
@@ -410,7 +412,7 @@ function data.MakeRidge(startPos, startDir, startHeight, peakHeight, maxHeight, 
 	}
 
 	local oldDir = startDir
-	local maxAngle = math.rad(8)
+	local maxAngle = math.rad(angle) -- 8
 	local stop = false
 	local goDown = false
 	local count = 0
@@ -474,7 +476,7 @@ function data.MakeRidges(config)
 					local startPos = vec2.add(pos, vec2.new(rndx, rndy))
 					local startDir = math.random() * math.pi * 2
 					local peakHeight = math.randf(config.minHeight, config.maxHeight - 5)
-					ridges[#ridges + 1] = data.MakeRidge(startPos, startDir, 0, peakHeight, config.maxHeight, 500.0)
+					ridges[#ridges + 1] = data.MakeRidge(startPos, startDir, 0, peakHeight, config.maxHeight, 500.0, config.angle)
 				end
 			end
 		end
@@ -517,12 +519,12 @@ function data.MakeValley(valleys, startPos, startDir, length, step, order)
 	until length < 0
 end
 
-function data.MakeManyValleys()
+function data.MakeManyValleys(initialValleys)
 	local valleys = { 
 		points = { }
 	}
 
-	local initialValleys = 4
+	--local initialValleys = 4
 	local valDir = math.random() * math.pi * 2
 	local frac = 2 / initialValleys;
 

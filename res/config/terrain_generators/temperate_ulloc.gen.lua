@@ -10,21 +10,29 @@ function data()
     order = 0,
     name = _("Ultima Loca Temperate"),
     params = {
-      {
-        key = "ulloc_mountain_low",
-        name = _("Minimum Height Mountains"),
-        values = { "", "", "", "", "", "", "", "", "", "" },
-        defaultIndex = 5,
-        uiType = "SLIDER",
-        tooltip = "From 20 to 200m in steps of 20m.",
-      },
+      --{
+      --  key = "ulloc_mountain_low",
+      --  name = _("Minimum Height Mountains"),
+      --  values = { "", "", "", "", "", "", "", "", "", "" },
+      --  defaultIndex = 5,
+      --  uiType = "SLIDER",
+      --  tooltip = "From 20 to 200m in steps of 20m.",
+      --},
       {
         key = "ulloc_mountain_height",
-        name = _("Maximum Height Mountains"),
-        values = { "", "", "", "", "", "", "", "", "" },
+        name = _("Mountain Height"),
+        values = { "", "", "", "", "", "", "", "", "", "", "", "", "" },
         defaultIndex = 5,
         uiType = "SLIDER",
-        tooltip = "From 300 to 1500m in steps of 150m.",
+        tooltip = "From 300 to 1500m in steps of 100m.",
+      },
+      {
+        key = "ulloc_mountain_seed",
+        name = _("Mountain Range Curvature"),
+        values = { "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "" },
+        defaultIndex = 7,
+        uiType = "SLIDER",
+        tooltip = "Straight or curved mountain ranges.",
       },
       {
         key = "ulloc_terrain_ratio",
@@ -56,24 +64,24 @@ function data()
       },
       {
         key = "ulloc_rand_river",
-        name = _("Random river widths?"),
-        values = { "No", "Yes" },
+        name = _("Random river widths"),
+        values = { "0", "1" },
         defaultIndex = 0,
-        uiType = "BUTTON",
+        uiType = "CHECKBOX",
       },
       {
         key = "ulloc_winding_river",
-        name = _("Winding (zig-zag) rivers?"),
-        values = { "No", "Yes" },
+        name = _("Winding (zig-zag) rivers"),
+        values = { "0", "1" },
         defaultIndex = 0,
-        uiType = "BUTTON",
+        uiType = "CHECKBOX",
       },
       {
         key = "ulloc_river_lakes",
-        name = _("Lakes in rivers?"),
-        values = { "No", "Yes" },
+        name = _("Lakes in rivers"),
+        values = { "0", "1" },
         defaultIndex = 1,
-        uiType = "BUTTON",
+        uiType = "CHECKBOX",
       },
       {
         key = "ulloc_tree_density",
@@ -81,7 +89,6 @@ function data()
         values = { "", "", "", "", "", "", "", "", "", "", "" },
         defaultIndex = 5,
         uiType = "SLIDER",
-        tooltip = "Trees along mountains are only marginally affected by this, except when set to 0.",
       },
       {
         key = "ulloc_treeline",
@@ -96,7 +103,6 @@ function data()
         values = { "None", "Along rivers", "Everywhere" },
         defaultIndex = 1,
         uiType = "BUTTON",
-        tooltip = "Rocks will still be placed on riverbanks.",
       },
       --{
       --  key = "ulloc_coast",
@@ -117,17 +123,12 @@ function data()
 
       -- #################
       -- #### CONFIG
-      local min_height_mountains = params.ulloc_mountain_low + 1
-      local max_height_mountains = params.ulloc_mountain_height + 2
-      local avg_height_mountains = (max_height_mountains + min_height_mountains) / 2
+      local max_height_mountains = 300 + (100 * params.ulloc_mountain_height)
+      local mountain_ratio = params.ulloc_terrain_ratio
+      local valley_amount = 3 - mountain_ratio
 
-      -- There are 9 levels, determined practically MAX density goes from 0.1 to 0.9; so we can divide by 10
-      -- The minimum height does not have much effect on density (just slightly, we can ignore it)
-      local mountain_density = (11 - max_height_mountains) / 10
-      -- LOW, MED & MAX is 3 levels, so we divide by 3
-      mountain_density = mountain_density / 3
-      -- then we multiple by level
-      mountain_density = (params.ulloc_terrain_ratio + 1) * mountain_density
+      local mountain_low_probability = ((1600 - max_height_mountains) / 1000 ) / valley_amount
+      local mountain_high_probability = mountain_low_probability / 6
 
       local river_amount = params.ulloc_rivers / 10
       local humidity = params.ulloc_tree_density / 10
@@ -137,12 +138,12 @@ function data()
 
       local riverConfig = {
         depthScale = 1.5,
-        maxOrder = math.floor(river_amount * 14),
+        maxOrder = river_amount * 10,
         segmentLength = 2400,
         bounds = params.bounds,
         baseProbability = river_amount * river_amount * 2,
         minDist = river_amount > 0.5 and 2 or 3,
-        width = params.ulloc_river_width,
+        width = params.ulloc_river_width * 1.5,
         doRandomWidth = params.ulloc_rand_river == 1,
         curvature = params.ulloc_curves / 10,
         is_winding = params.ulloc_winding_river == 1,
@@ -169,13 +170,17 @@ function data()
 
       local ridgesConfig = {
         bounds = params.bounds,
-        probabilityLow = mountain_density,
-        probabilityHigh = 0,
-        minHeight = (10 * min_height_mountains) + (10 * min_height_mountains),
-        maxHeight = (50 * max_height_mountains) + (100 * max_height_mountains),
+        probabilityLow = mountain_low_probability,
+        probabilityHigh = mountain_high_probability,
+        minHeight = 150,
+        maxHeight = max_height_mountains,
+        angle = params.ulloc_mountain_seed + 1
       }
 
       local valleys = {}
+      if valley_amount > 0 then
+        valleys = mapgenutil.MakeManyValleys(valley_amount)
+      end
       local ridges = mapgenutil.MakeRidges(ridgesConfig)
 
       -- #################
@@ -194,7 +199,7 @@ function data()
       end
 
       local noiseMap = mkTemp:Get()
-      result.layers:Noise(noiseMap, 15 * avg_height_mountains)
+      result.layers:Noise(noiseMap, 0.1 * max_height_mountains)
 
       local distanceMap = mkTemp:Get()
       result.layers:Distance(result.heightmapLayer, distanceMap)
@@ -226,6 +231,9 @@ function data()
         result.layers:Add(ridgesMap, result.heightmapLayer, result.heightmapLayer)
         result.layers:PopColor()
       end
+
+      -- #################
+      -- #### Lakes
 
       -- #################
       -- #### NOISE

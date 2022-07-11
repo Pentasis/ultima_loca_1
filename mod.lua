@@ -6,8 +6,8 @@ local climate = require "ulloc/snowtops"
 function data()
   return {
     info = {
-      name = "Ultima Loca",
-      description = "Temperate Terrain Generator with more options.",
+      name = "Not So Temperate Generator",
+      description = "Temperate Terrain Generator that actually makes nice looking maps.",
       tags = { "Misc", "Script Mod" },
       authors = {
         {
@@ -15,13 +15,13 @@ function data()
           role = 'CREATOR',
         },
       },
-      minorVersion = 1,
+      minorVersion = 3,
       severityAdd = "NONE",
       severityRemove = "NONE",
       params = {
         {
           key = "ulloc_snowtops",
-          name = "Snow tops on Mountains?",
+          name = "Snow caps on Mountains?",
           uiType = "BUTTON",
           values = { "Yes", "No" },
           defaultIndex = 0,

@@ -2,3 +2,16 @@
 - only change temperate climate for snow caps. Before desert/tropical were also affected.
 - Added option for 'winding' rivers (zig-zag).
 - Change default for mountain density to 'medium'
+- Improved mountain-ridge tree densities.
+- Improved snow layer
+- Bugfix: error on random number when river is set to minimum
+- Fixed: rocks didn't render when trees were set to 0. # of rocks is still lower (maxSlope is set for both trees & rocks in vanilla, I need to find a solution for this).
+
+1.3
+- Changed how mountain density is calculated
+- Added the ability to change the mountain ridge curvature
+- Removed minimum height of mountains (now set to 150 by default)
+- Even wider rivers (this is the maximum before deformation occurs)
+- More chance of branching rivers
+- Changed some buttons to checkboxes (for UX and space)
+- Changed name of mod

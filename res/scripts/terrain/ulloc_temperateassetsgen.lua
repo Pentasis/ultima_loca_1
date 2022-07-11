@@ -31,6 +31,17 @@ data.Make = function(layers, config, mkTemp, heightMap, ridgesMap, distanceMap)
   -- #### CONFIG
   local noWater = config.water == 0
 
+  -- TODO: this is a dirty hack!
+  if config.humidity == 0 then
+    conifer = 0
+    shrub = 0
+    hills = 0
+    broadleaf = 0
+    river = 0
+    plains = 0
+    anyTree = 0
+  end
+
   -- LEVEL 1: Plain trees seed density
   -- Patch sizes and densities
   local seedDensity = 0.00008 - 0.0001 * config.humidity * config.humidity + 0.0001 -- increase to increase number of forest
@@ -59,16 +70,14 @@ data.Make = function(layers, config, mkTemp, heightMap, ridgesMap, distanceMap)
 
   -- LEVEL 4: Ridge trees (conifers)
   -- Densities
-  local maxSlope = 0.6 -- also for hills -- .8
+  local maxSlope = config.humidity * 2.0 -- also for hills -- .8
+  if maxSlope == 0 then maxSlope = 0.1 end -- Ensures (some) rocks still get rendered when trees are disabled
   local coniferDitheringCutoff = 0.6
   -- Heights
   local coniferLimit = hillsHighLimit * 0.75 --120 -- absolute [m] (where conifers have full density)
   local coniferTransitionLow = coniferLimit / 4 --30 -- transition size [m] (offset for conifers start)
   local coniferTransitionHigh = coniferTransitionLow * 3 --80 -- transition size [m] (offset for conifer end)
 
-  if config.humidity == 0 then
-    seedDensity = 0
-  end
 
   -- #################
   -- #### NO WATER GENERATION
