@@ -535,4 +535,88 @@ function data.MakeManyValleys(initialValleys)
 	return valleys
 end
 
+-- ================================================================== --
+
+function data.MakeLakes(startPos, startDir, startDepth, peakDepth, maxDepth, step)
+	local ridge = {
+		points = {},
+		heights = {},
+		directions = {},
+	}
+
+	local oldDir = startDir
+	local maxAngle = math.rad(8)
+	local stop = false
+	local goUp = false
+	local count = 0
+	while true do
+		ridge.points[#ridge.points + 1] = { startPos.x, startPos.y }
+		ridge.heights[#ridge.heights + 1] = startDepth
+		ridge.directions[#ridge.directions + 1] = 0.5 * (oldDir + startDir)
+		if stop then break end
+
+		startPos = vec2.add(startPos, vec2.mul(step, vec2.fromAngle(startDir)))
+
+		oldDir = startDir;
+		startDir = startDir + math.random(-maxAngle, maxAngle);
+
+		if goUp then
+			startDepth = startDepth + math.random(-10, 20)
+		else
+			startDepth = startDepth + math.random(-20, 10)
+		end
+
+		if startDepth <= peakDepth then goUp = true end
+		if goUp and startDepth >= 0 then stop = true end
+		startDepth = math.clamp(startDepth, 0, maxDepth)
+
+		count = count + 1
+	end
+
+	return ridge
+end
+
+function data.MakeManyLakes(config)
+	local ridges = {}
+
+	local dimx = 2048
+	local dimy = 2048
+
+	local nx = math.ceil((config.bounds.max.x - config.bounds.min.x) / (2*dimx) )
+	local ny = math.ceil((config.bounds.max.y - config.bounds.min.y) / (2*dimy) )
+
+	for i = -ny, ny do
+		for j = -nx, nx do
+
+			local randomNumber = math.random()
+			local numr = config.density ~= nil and config.density or
+			(randomNumber > config.probabilityLow and 0 or (randomNumber > config.probabilityHigh and 1 or 2))
+
+			local skip = false
+
+			local pos = vec2.new(dimx * j, dimy * i)
+			if config.strengthMap then
+				local X = math.floor((j + nx) / (2 * nx + 1) * config.strengthMap.size[1])
+				local Y = math.floor((i + ny) / (2 * ny + 1) * config.strengthMap.size[2])
+				if config.strengthMap.data[Y * config.strengthMap.size[1] + X + 1] > 0.3 then
+					skip = true
+				end
+			end
+			if not skip then
+				for I = 1, numr do
+
+					local rndx = math.randf(0.25 * dimx, 0.75 * dimx)
+					local rndy = math.randf(0.25 * dimy, 0.75 * dimy)
+					local startPos = vec2.add(pos, vec2.new(rndx, rndy))
+					local startDir = math.random() * math.pi * 2
+					local peakDepth = math.randf(config.minDepth, config.maxDepth + 5)
+					ridges[#ridges + 1] = data.MakeRidge(startPos, startDir, 0, peakDepth, config.maxDepth, 500.0)
+				end
+			end
+		end
+	end
+
+	return ridges
+end
+
 return data

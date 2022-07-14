@@ -24,7 +24,7 @@ function data()
         values = { "", "", "", "", "", "", "", "", "", "", "", "", "" },
         defaultIndex = 5,
         uiType = "SLIDER",
-        tooltip = "From 300 to 1500m in steps of 100m.",
+        tooltip = "From 300 to 1400m in steps of 100m.",
       },
       {
         key = "ulloc_mountain_seed",
@@ -83,6 +83,13 @@ function data()
         defaultIndex = 1,
         uiType = "CHECKBOX",
       },
+      --{
+      --  key = "ulloc_lakes",
+      --  name = _("Scattered Lakes?"),
+      --  values = { "None", "Small", "Big", "Huge" },
+      --  defaultIndex = 0,
+      --  uiType = "COMBOBOX",
+      --},
       {
         key = "ulloc_tree_density",
         name = _("Number of forests"),
@@ -102,17 +109,11 @@ function data()
         name = _("Scattered Rocks?"),
         values = { "None", "Along rivers", "Everywhere" },
         defaultIndex = 1,
-        uiType = "BUTTON",
+        uiType = "COMBOBOX",
       },
-      --{
-      --  key = "ulloc_coast",
-      --  name = _("Sea or Ocean Coastline?"),
-      --  values = { "No", "Yes" },
-      --  defaultIndex = 0,
-      --  uiType = "BUTTON",
-      --},
     },
     updateFn = function(params)
+      print("seed: " .. math.random(1, 100000000))
       math.randomseed(math.random(1, 100000000))
 
       local result = {
@@ -123,12 +124,33 @@ function data()
 
       -- #################
       -- #### CONFIG
-      local max_height_mountains = 300 + (100 * params.ulloc_mountain_height)
-      local mountain_ratio = params.ulloc_terrain_ratio
-      local valley_amount = 3 - mountain_ratio
+      local VALLEYS = {
+        { 0, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3 },
+        { 0, 0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 2 },
+        { 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1 },
+      }
+      local LOW_PROB = {
+        { 0.4, 0.1 },
+        { 0.5, 0.15 },
+        { 0.6, 0.2 },
+      }
+      local HIGH_PROB = {
+        { 0.1, 0 },
+        { 0.15, 0 },
+        { 0.2, 0 },
+      }
 
-      local mountain_low_probability = ((1600 - max_height_mountains) / 1000 ) / valley_amount
-      local mountain_high_probability = mountain_low_probability / 6
+      local mountain_height_selected = params.ulloc_mountain_height + 1
+      local max_height_mountains = 200 + (100 * mountain_height_selected)
+      local mountain_ratio = params.ulloc_terrain_ratio + 1
+
+      local valley_amount = VALLEYS[mountain_ratio][mountain_height_selected]
+
+      local delta_low_prob = (LOW_PROB[mountain_ratio][1] - LOW_PROB[mountain_ratio][2]) / 13
+      local delta_high_prob = (HIGH_PROB[mountain_ratio][1] - HIGH_PROB[mountain_ratio][2]) / 13
+
+      local mountain_low_probability = LOW_PROB[mountain_ratio][1] - (mountain_height_selected * delta_low_prob)
+      local mountain_high_probability = HIGH_PROB[mountain_ratio][1] - (mountain_height_selected * delta_high_prob)
 
       local river_amount = params.ulloc_rivers / 10
       local humidity = params.ulloc_tree_density / 10
@@ -183,6 +205,16 @@ function data()
       end
       local ridges = mapgenutil.MakeRidges(ridgesConfig)
 
+      --local scatteredLakesConfig = {
+      --  bounds = params.bounds,
+      --  probabilityLow = 0.4,
+      --  probabilityHigh = 0.0,
+      --  minDepth = -20,
+      --  maxDepth = -150,
+      --}
+--
+      --local scatteredLakes = mapgenutil.MakeManyLakes(scatteredLakesConfig)
+
       -- #################
       -- #### PREPARE
       local mkTemp = layersutil.TempMaker.new()
@@ -234,6 +266,31 @@ function data()
 
       -- #################
       -- #### Lakes
+      --local scatteredLakesMap
+      --do
+      --  -- lakes
+      --  result.layers:PushColor("#22AADD")
+      --  local t1 = mkTemp:Get()
+      --  result.layers:Map(distanceMap, t1, { 15, 2500 }, { 0, 1 }, true)
+      --  result.layers:Mad(t1, noiseMap, result.heightmapLayer)
+      --  noiseMap = mkTemp:Restore(noiseMap)
+--
+      --  local t2 = mkTemp:Get()
+      --  result.layers:Ridge(t2, {
+      --    valleys = {},
+      --    ridges = scatteredLakes,
+      --    noiseStrength = 10
+      --  })
+--
+      --  result.layers:Map(distanceMap, t1, { 50, 1500 }, { 0, 1 }, true)
+      --  scatteredLakesMap = mkTemp:Get()
+      --  result.layers:Mul(t1, t2, scatteredLakesMap)
+      --  t1 = mkTemp:Restore(t1)
+      --  t2 = mkTemp:Restore(t2)
+--
+      --  result.layers:Add(scatteredLakesMap, result.heightmapLayer, result.heightmapLayer)
+      --  result.layers:PopColor()
+      --end
 
       -- #################
       -- #### NOISE
@@ -274,6 +331,7 @@ function data()
       }
 
       result.layers:PushColor("#007777")
+      -- add scatteredLakesMap?
       result.forestMap, result.treesMapping, result.assetsMap, result.assetsMapping = temperateassetsgen.Make(
        result.layers, config, mkTemp, result.heightmapLayer, ridgesMap, distanceMap
       )
@@ -283,6 +341,7 @@ function data()
       -- #################
       -- #### FINISH
       ridgesMap = mkTemp:Restore(ridgesMap)
+      --scatteredLakesMap = mkTemp:Restore(scatteredLakesMap)
       mkTemp:Restore(result.forestMap)
       mkTemp:Restore(result.assetsMap)
       mkTemp:Finish()

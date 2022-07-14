@@ -1,6 +1,7 @@
 [h1]Not so Temperate Generator[/h1]
+(Previously 'Ultima Loca')
 
-This generator creates mixed(!) narrower & wider rivers and well-defined mountain ranges with very flat areas inbetween.
+This generator creates mixed narrower & wider rivers and well-defined mountain ranges with very flat areas inbetween.
 
 It is still WIP but functional and safe to use (lots more options and tweaks still to come).
 
@@ -9,21 +10,19 @@ The reason I made this was because I found the vanilla generator and other modde
 [h2]New Features & Changes[/h2]
 [list]
 [*]Winding rivers (v1.2)
-[*]Somewhat better mountain-density calculation*
+[*]Somewhat better mountain-density calculation
 [*]Mountain ridge curvature (v1.3)
 [*]Removed minimum mountain height (now fixed at 150m)
-[*]Wider rivers than before (v1.3). I cannot make them wider than this because they will deform.
+[*]Wider rivers than before (v1.3). I cannot make them wider than this because then they will start to deform.
 [*]Bigger chance of (more) branching rivers.
 [*]Changed the name of the mod.
 [/list]
 
-*)Density is a tough setting to control. As mountains get higher, density goes up by default so I bring it down again. But there seems to be some sort of exponential factor involved I haven't figured out yet. Let me know in the comments if you are happy with how density works now.
-
 [h2]Mountains[/h2]
 [list]
-[*]Higher mountains (upto about 1500m) with a more distinct transition between flatland and cliffs.
+[*]Higher mountains (upto 1500m) with a more distinct transition between flatland and cliffs.
 [*]If you enable snow tops in the mod settings (on by default) mountain tops will be covered in snow above ~750m.
-[*]Change mountain range curvature.
+[*]Control over mountain range curvature.
 [/list]
 
 [h2]Rivers[/h2]
@@ -34,7 +33,7 @@ The reason I made this was because I found the vanilla generator and other modde
 [*]More rivers.
 [*]Curved rivers.
 [*]Random river widths.
-[*]Winding (zig-zag) rivers. These seem to work best when river-curvature is set somewhere in the middle.
+[*]Winding (zig-zag) rivers.
 [/list]
 
 [h2]Rocks[/h2]
@@ -52,10 +51,9 @@ The reason I made this was because I found the vanilla generator and other modde
 
 [h2]TODO:[/h2]
 [list]
-[*]Option to add a coastline?
-[*]Scattered lakes (outside rivers)?
-[*]Translations
-[*]Mod option for more rock textures?
+[*]Scattered lakes (outside rivers).
+[*]Translations.
+[*]Mod option for more rock (mountain) textures?
 [/list]
 
 [h2]Important[/h2]
