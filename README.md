@@ -1,3 +1,9 @@
+# Archived Project
+
+In anticipation of Transport Fever 3 I have archived all my mods for TF2.
+
+WARNING: This mod has been published on the Steam Workshop under the name "Not So Temperate Generator".
+
 # Ultima Loca
 
 This generator enables (mixed !) narrow & wide rivers and well-defined mountain ranges with very flat areas inbetween.
